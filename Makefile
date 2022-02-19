@@ -1,14 +1,18 @@
+FLAGS:=-Wall -Wextra -Werror
+
 all:
-	@gcc mt_client.c mt_utils.c -o mt_client
-server:
-	@gcc mt_server.c mt_utils.c -o mt_server
-	./mt_server
+	@make server
+	@make client
+server: mt_server.c mt_utils.c
+	@gcc $(FLAGS) mt_server.c mt_utils.c -o server
+client: mt_client.c mt_utils.c
+	@gcc $(FLAGS) mt_client.c mt_utils.c -o client
 clean:
-	@rm -f mt_server mt_client
+	@rm server client
 fclean:
-	@make clean
-make re:
-	@make clean
+	@rm -f server client
+re:
+	@make fclean
 	@make all
 bonus:
 	@make all

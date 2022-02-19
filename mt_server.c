@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   mt_server.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lmuzio <lmuzio@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/18 20:09:56 by lmuzio            #+#    #+#             */
+/*   Updated: 2022/02/11 18:52:34 by lmuzio           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minitalk.h"
 
 void	multibyte_handler(unsigned char byte)
@@ -7,12 +19,9 @@ void	multibyte_handler(unsigned char byte)
 	char				c;
 
 	c = 7;
-	if (!nbytes)
-	{
-		if (!value)
-			while (((byte) >> c--) % 2)
-				nbytes++;
-	}
+	if (!nbytes && !value)
+		while (((byte) >> c--) % 2)
+			nbytes++;
 	value += (byte) << ((4 - nbytes--) * 8);
 	if (!nbytes && value)
 	{
@@ -26,11 +35,7 @@ void	multibyte_handler(unsigned char byte)
 void	output_handler(unsigned char res, pid_t *sender)
 {
 	if (!res)
-	{
-		if (write(1, "\\", 1) == -1)
-			mt_error("Error: Failed to write ending character");
 		*sender = 0;
-	}
 	else if (res < 128)
 	{
 		if (write(1, &res, 1) == -1)
@@ -47,6 +52,7 @@ void	bit_handler(int sig, siginfo_t *info, void *context)
 	static pid_t			sender = 0;
 	char					bit;
 
+	(void) context;
 	if (!sender)
 		sender = info->si_pid;
 	if (sig == 30)
@@ -61,12 +67,12 @@ void	bit_handler(int sig, siginfo_t *info, void *context)
 		c = 0;
 		res = 0;
 	}
-	usleep(30);
+	usleep(35);
 	if (sender && kill(sender, SIGUSR1))
 		mt_error("Error: Failed to send answer");
 }
 
-int	main(int argc, char **argv)
+int	main(void)
 {
 	struct sigaction	s;
 
@@ -75,7 +81,6 @@ int	main(int argc, char **argv)
 		mt_error("Error: Failed to apply sigaction");
 	if (sigaction(SIGUSR2, &s, 0))
 		mt_error("Error: Failed to apply sigaction");
-	write(1, "PID: ", 5);
 	ft_putnbr(getpid());
 	write(1, "\n", 1);
 	while (1)
