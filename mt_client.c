@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   mt_client.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: lmuzio <lmuzio@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/18 20:09:44 by lmuzio            #+#    #+#             */
-/*   Updated: 2022/02/11 18:58:30 by lmuzio           ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   mt_client.c                                        :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: lmuzio <lmuzio@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/01/18 20:09:44 by lmuzio        #+#    #+#                 */
+/*   Updated: 2023/07/11 18:51:08 by lmuzio        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,22 +50,22 @@ void	getans(int sig, siginfo_t *info, void *context)
 
 int	byte_handler(unsigned char value, pid_t pid)
 {
-	char	bytesize;
-	char	bit;
+	char		bytesize;
+	int			bit;
+	static int	sig[2] = {
+		SIGUSR1,
+		SIGUSR2
+	};
 
 	bytesize = 8;
 	while (bytesize--)
 	{
+		g_answer = 0;
+		bit = ((value) >> bytesize) & 1;
+		if (kill(pid, sig[bit]))
+			return (1);
 		while (!g_answer)
 			pause();
-		g_answer = 0;
-		bit = ((value) >> bytesize) % 2;
-		if (!bit)
-			if (kill(pid, SIGUSR1))
-				return (1);
-		if (bit)
-			if (kill(pid, SIGUSR2))
-				return (1);
 	}
 	return (0);
 }
@@ -77,6 +77,7 @@ int	main(int argc, char **argv)
 
 	if (argc < 3)
 		mt_error("Error: Argument count too low\n");
+	ft_putnbr(getpid());
 	fill_sig(&s, &getans);
 	if (sigaction(SIGUSR1, &s, 0))
 		mt_error("Error: Failed to apply sigaction");
