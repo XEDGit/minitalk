@@ -6,35 +6,39 @@
 /*   By: lmuzio <lmuzio@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 20:09:56 by lmuzio        #+#    #+#                 */
-/*   Updated: 2023/07/11 21:23:25 by lmuzio        ########   odam.nl         */
+/*   Updated: 2023/07/11 22:18:50 by lmuzio        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	bit_handler(int sig, siginfo_t *info, void *context)
+void	bit_handler(int sig, siginfo_t *info, void *co0ntext)
 {
 	static char				c = 0;
-	static unsigned char	res = 0;
 	static pid_t			sender = 0;
 	char					bit;
+	static unsigned char	res[SIZE];
+	static int				i = 0;
 
 	(void) context;
 	if (!sender)
 		sender = info->si_pid;
 	bit = sig == SIGUSR2;
-	res = (res << 1) + bit;
+	res[i] = (res[i] << 1) + bit;
 	if (c++ == 7)
 	{
-		if (write(1, &res, 1) == -1)
-			mt_error("Error writing to stdout\n");
 		c = 0;
-		res = 0;
+		i++;
 	}
 	if (sender && kill(sender, SIGUSR1))
 		mt_error("Error: Failed to send answer\n");
-	if (!res)
+	if (!res[i])
 		sender = 0;
+	bit = (!res[i] || i == SIZE);
+	if (bit && write(1, &res, i) == -1)
+		mt_error("Error writing to stdout\n");
+	if (bit)
+		i = 0;
 }
 
 int	main(void)

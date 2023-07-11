@@ -6,7 +6,7 @@
 /*   By: lmuzio <lmuzio@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 20:09:44 by lmuzio        #+#    #+#                 */
-/*   Updated: 2023/07/11 18:51:08 by lmuzio        ########   odam.nl         */
+/*   Updated: 2023/07/11 22:19:30 by lmuzio        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ int	main(int argc, char **argv)
 
 	if (argc < 3)
 		mt_error("Error: Argument count too low\n");
-	ft_putnbr(getpid());
 	fill_sig(&s, &getans);
 	if (sigaction(SIGUSR1, &s, 0))
 		mt_error("Error: Failed to apply sigaction");
