@@ -6,7 +6,7 @@
 /*   By: lmuzio <lmuzio@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/06 20:22:55 by lmuzio        #+#    #+#                 */
-/*   Updated: 2023/07/11 19:16:24 by lmuzio        ########   odam.nl         */
+/*   Updated: 2023/07/12 00:27:29 by lmuzio        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,6 @@ void	mt_error(char *msg)
 			mt_error("Error writing to stdout\n");
 	}
 	exit(1);
-}
-
-void	fill_sig(struct sigaction *act, void (*f)(int, siginfo_t *, void *))
-{
-	if (!act || !f)
-		mt_error("Error: Failed to create sigaction");
-	act->sa_sigaction = f;
-	act->sa_mask = (__sigset_t){0};
-	act->sa_flags = SA_SIGINFO | SA_RESTART;
 }
 
 void	ft_putnbr(long n)

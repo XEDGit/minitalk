@@ -6,7 +6,11 @@
 /*   By: lmuzio <lmuzio@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/18 20:09:44 by lmuzio        #+#    #+#                 */
+<<<<<<< HEAD
 /*   Updated: 2023/07/11 22:19:30 by lmuzio        ########   odam.nl         */
+=======
+/*   Updated: 2023/07/12 00:49:57 by lmuzio        ########   odam.nl         */
+>>>>>>> fa41d32 (Simplified)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,18 +44,15 @@ int	ft_atoi(const char *str)
 	return (res);
 }
 
-void	getans(int sig, siginfo_t *info, void *context)
+void	getans(int sig)
 {
-	g_answer = 1;
 	(void) sig;
-	(void) info;
-	(void) context;
+	g_answer = 1;
 }
 
 int	byte_handler(unsigned char value, pid_t pid)
 {
 	char		bytesize;
-	int			bit;
 	static int	sig[2] = {
 		SIGUSR1,
 		SIGUSR2
@@ -61,11 +62,13 @@ int	byte_handler(unsigned char value, pid_t pid)
 	while (bytesize--)
 	{
 		g_answer = 0;
-		bit = ((value) >> bytesize) & 1;
-		if (kill(pid, sig[bit]))
+		if (kill(pid, sig[((value) >> bytesize) & 1]))
 			return (1);
-		while (!g_answer)
-			pause();
+		while (1)
+		{
+			if (g_answer)
+				break ;
+		}
 	}
 	return (0);
 }
@@ -73,12 +76,10 @@ int	byte_handler(unsigned char value, pid_t pid)
 int	main(int argc, char **argv)
 {
 	pid_t				pid;
-	struct sigaction	s;
 
 	if (argc < 3)
 		mt_error("Error: Argument count too low\n");
-	fill_sig(&s, &getans);
-	if (sigaction(SIGUSR1, &s, 0))
+	if (signal(SIGUSR1, getans) == SIG_ERR)
 		mt_error("Error: Failed to apply sigaction");
 	pid = ft_atoi(argv[1]);
 	if (!pid || pid <= 0)
@@ -90,6 +91,4 @@ int	main(int argc, char **argv)
 			mt_error("Error: Failed to send signals\n");
 		argv[2]++;
 	}
-	if (byte_handler(0, pid))
-		mt_error("Error: Failed to send End of communication\n");
 }
