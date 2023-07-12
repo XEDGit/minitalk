@@ -12,7 +12,7 @@
 
 #include "minitalk.h"
 
-void	bit_handler(int sig, siginfo_t *info, void *co0ntext)
+void	bit_handler(int sig, siginfo_t *info, void *context)
 {
 	static char				c = 0;
 	static unsigned char	res = 0;
@@ -21,8 +21,10 @@ void	bit_handler(int sig, siginfo_t *info, void *co0ntext)
 	res = (res << 1) + (sig == SIGUSR2);
 	if (c++ == 7)
 	{
+		if (write(1, &res, 1) == -1)
+			mt_error("Error writing to stdout");
 		c = 0;
-		i++;
+		res = 0;
 	}
 	if (kill(info->si_pid, SIGUSR1))
 		mt_error("Error: Failed to send answer\n");

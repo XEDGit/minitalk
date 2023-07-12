@@ -17,8 +17,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-# define SIZE 100000
-
+#include <stdio.h>
 
 void	mt_error(char *msg);
 void	ft_putnbr(long n);

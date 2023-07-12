@@ -1,4 +1,4 @@
-FLAGS:=-Wall -Wextra -Werror -O3
+FLAGS:=-Wall -Wextra -Werror
 
 all: server client
 
